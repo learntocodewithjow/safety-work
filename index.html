@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Safety Work</title>
+<style>
+:root{--teal:#138d8a;--teal-dark:#087572;--navy:#183653;--muted:#647789;--line:#dce7ee;--bg:#f5f9fb}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--navy);min-height:100vh;display:flex;flex-direction:column}
+header{height:54px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 24px;gap:10px;font-size:14px;font-weight:bold}
+.logo{width:23px;height:23px;background:var(--teal);color:#fff;border-radius:7px;display:grid;place-items:center;font-size:14px}
+main{width:min(650px,calc(100% - 32px));margin:42px auto;flex:1;display:flex;align-items:center}
+.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:clamp(22px,5vw,42px);width:100%;box-shadow:0 8px 30px #1836530a}
+.center{text-align:center}
+h1{font-size:clamp(25px,5vw,34px);margin:12px 0;color:var(--navy);line-height:1.2}
+h2{font-size:22px;margin:0 0 14px;line-height:1.4}
+p{font-size:14px;color:var(--muted);line-height:1.7}
+.lead{max-width:460px;margin:12px auto 24px}
+.symbol{width:56px;height:56px;border-radius:18px;background:#e3f6f4;color:var(--teal);display:grid;place-items:center;font-size:27px;margin:0 auto 18px}
+button{font:inherit;cursor:pointer}
+.primary{background:var(--teal);color:white;border:0;border-radius:9px;padding:13px 20px;font-weight:bold;min-width:130px}
+.primary:hover{background:var(--teal-dark)}
+.secondary{background:white;color:var(--navy);border:1px solid var(--line);border-radius:9px;padding:12px 17px}
+.actions{display:flex;justify-content:space-between;gap:12px;margin-top:28px}
+.actions .primary{margin-left:auto}
+.progress-top{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:10px}
+.track{height:7px;border-radius:9px;background:#e8eef2;overflow:hidden;margin-bottom:30px}
+.fill{height:100%;background:var(--teal);width:10%;transition:width .2s}
+.question{font-size:20px;line-height:1.5;font-weight:bold;margin:0 0 22px}
+.options{display:grid;gap:9px}
+.option{display:flex;align-items:center;gap:12px;padding:13px 14px;border:1px solid var(--line);border-radius:9px;cursor:pointer;font-size:14px;transition:.15s}
+.option:hover{border-color:#87c9c5;background:#f7fcfb}
+.option:has(input:checked){border-color:var(--teal);background:#eaf8f6}
+.option input{accent-color:var(--teal);width:17px;height:17px}
+.option .num{width:20px;color:var(--muted);font-size:12px}
+.small{font-size:12px}
+.hidden{display:none!important}
+.score{font-size:43px;font-weight:bold;color:var(--navy)}
+.score span{font-size:15px;color:var(--muted);font-weight:normal}
+.tag{display:inline-block;background:#e3f6f4;color:var(--teal-dark);padding:6px 12px;border-radius:20px;font-size:12px;font-weight:bold}
+.summary{background:#f7fafc;border:1px solid var(--line);border-radius:10px;padding:16px;margin:20px 0;text-align:left}
+.summary li{margin:9px 0;color:var(--muted);font-size:13px;line-height:1.5}
+footer{text-align:center;color:#8796a1;font-size:11px;padding:18px;line-height:1.6}
+@media(max-width:480px){header{padding:0 16px}main{margin:20px auto}.panel{padding:23px 18px}.question{font-size:18px}.actions button{min-width:0}}
+</style>
+</head>
+<body>
+<header><span class="logo">S</span> Safety Work</header>
+<main>
+  <section id="welcome" class="panel center">
+    <div class="symbol">♡</div>
+    <div class="small" style="color:var(--teal);font-weight:bold;letter-spacing:1px">SURVEI KARYAWAN</div>
+    <h1>SafeSpace</h1>
+    <h2 style="font-size:17px">Pengukuran Psychological Safety Karyawan</h2>
+    <p class="lead">Bantu kami memahami pengalaman Anda di tempat kerja untuk mendukung lingkungan yang lebih aman, terbuka, dan suportif.</p>
+    <p class="small">Survei contoh ini terdiri dari 10 pertanyaan. Tidak ada jawaban benar atau salah; pilih jawaban yang paling sesuai dengan pengalaman Anda.</p>
+    <button class="primary" onclick="startSurvey()">Mulai Survei →</button>
+  </section>
+
+  <section id="survey" class="panel hidden">
+    <div class="progress-top"><span id="question-count">Pertanyaan 1 dari 10</span><span id="percent">10%</span></div>
+    <div class="track"><div id="progress" class="fill"></div></div>
+    <p class="small" style="color:var(--teal);font-weight:bold;margin-bottom:8px">PENGALAMAN DI TEMPAT KERJA</p>
+    <h2 id="question-text" class="question"></h2>
+    <div id="options" class="options"></div>
+    <div class="actions">
+      <button id="back" class="secondary" onclick="previousQuestion()">← Kembali</button>
+      <button id="next" class="primary" onclick="nextQuestion()">Lanjut →</button>
+    </div>
+    <p class="small" style="text-align:center;margin:20px 0 0">Jawaban hanya tersimpan sementara di halaman ini.</p>
+  </section>
+
+  <section id="thanks" class="panel center hidden">
+    <div class="symbol">✓</div><h1>Terima kasih!</h1>
+    <p>Anda telah menyelesaikan survei contoh SafeSpace.</p>
+    <button class="primary" onclick="showResult()">Lihat Hasil →</button>
+  </section>
+
+  <section id="result" class="panel center hidden">
+    <div class="symbol">✧</div><p class="small" style="font-weight:bold;color:var(--teal)">HASIL SURVEI DEMO</p>
+    <h2>Ringkasan Psychological Safety</h2>
+    <div class="score"><span id="score">--</span><span> / 100</span></div>
+    <p><span id="level" class="tag">Hasil</span></p>
+    <p id="interpretation"></p>
+    <div class="summary">
+      <strong style="font-size:14px">Apa artinya?</strong>
+      <ul>
+        <li>Hasil merupakan ringkasan jawaban Anda, bukan diagnosis psikologis.</li>
+        <li>Gunakan hasil sebagai bahan refleksi dan diskusi untuk membangun lingkungan kerja yang lebih baik.</li>
+        <li>Untuk penelitian sungguhan, kuesioner perlu ditinjau dan diuji validitas serta reliabilitasnya.</li>
+      </ul>
+    </div>
+    <button class="primary" onclick="restart()">Kembali ke Beranda</button>
+  </section>
+</main>
+<footer>SafeSpace · Prototype penelitian mahasiswa<br>Versi demo — data tidak dikirim atau disimpan ke server.</footer>
+<script>
+const questions = [
+  "Saya merasa nyaman untuk menyampaikan pendapat saya di tempat kerja.",
+  "Rekan kerja saya mendukung ketika saya mencoba ide baru.",
+  "Saya merasa aman untuk mengakui kesalahan tanpa takut dipermalukan.",
+  "Manajer saya terbuka terhadap masukan dari karyawan.",
+  "Saya dapat bekerja sama dengan rekan kerja yang memiliki latar belakang berbeda.",
+  "Saya nyaman meminta bantuan ketika menghadapi kesulitan pekerjaan.",
+  "Perbedaan pendapat di tim dapat dibahas dengan saling menghormati.",
+  "Saya merasa kontribusi dan ide saya dihargai oleh tim.",
+  "Saya dapat mengajukan pertanyaan tanpa takut dianggap tidak kompeten.",
+  "Ketika terjadi masalah, tim berfokus mencari solusi daripada menyalahkan seseorang."
+];
+const choices = ["Sangat Tidak Setuju","Tidak Setuju","Netral","Setuju","Sangat Setuju"];
+let current = 0;
+let answers = Array(questions.length).fill(null);
+function show(id){["welcome","survey","thanks","result"].forEach(x=>document.getElementById(x).classList.toggle("hidden",x!==id));}
+function startSurvey(){current=0;answers=Array(questions.length).fill(null);renderQuestion();show("survey");}
+function renderQuestion(){
+ document.getElementById("question-count").textContent=`Pertanyaan ${current+1} dari ${questions.length}`;
+ document.getElementById("percent").textContent=`${Math.round((current+1)/questions.length*100)}%`;
+ document.getElementById("progress").style.width=`${(current+1)/questions.length*100}%`;
+ document.getElementById("question-text").textContent=questions[current];
+ const opts=document.getElementById("options");opts.innerHTML="";
+ choices.forEach((label,i)=>{
+  const el=document.createElement("label");el.className="option";
+  const input=document.createElement("input");input.type="radio";input.name="answer";input.value=i+1;input.checked=answers[current]===i+1;
+  input.addEventListener("change",()=>{answers[current]=i+1;});
+  const num=document.createElement("span");num.className="num";num.textContent=i+1;
+  const text=document.createElement("span");text.textContent=label;
+  el.append(input,num,text);opts.appendChild(el);
+ });
+ document.getElementById("back").style.visibility=current===0?"hidden":"visible";
+ document.getElementById("next").textContent=current===questions.length-1?"Selesai ✓":"Lanjut →";
+}
+function nextQuestion(){
+ if(!answers[current]){alert("Silakan pilih satu jawaban terlebih dahulu.");return;}
+ if(current<questions.length-1){current++;renderQuestion();}
+ else show("thanks");
+}
+function previousQuestion(){if(current>0){current--;renderQuestion();}}
+function showResult(){
+ const avg=answers.reduce((a,b)=>a+b,0)/answers.length;
+ const score=Math.round((avg-1)/4*100);
+ document.getElementById("score").textContent=score;
+ let level,desc;
+ if(score>=75){level="Relatif Baik";desc="Jawaban Anda menunjukkan persepsi psychological safety yang relatif positif. Pertahankan komunikasi terbuka dan dukungan antaranggota tim.";}
+ else if(score>=50){level="Sedang";desc="Ada beberapa aspek yang dapat ditingkatkan. Diskusi yang terbuka dan respons pemimpin yang suportif dapat membantu memperkuat rasa aman.";}
+ else{level="Perlu Perhatian";desc="Jawaban menunjukkan beberapa aspek yang mungkin perlu diperhatikan. Hasil ini sebaiknya ditindaklanjuti melalui percakapan yang aman dan tidak menyalahkan individu.";}
+ document.getElementById("level").textContent=level;
+ document.getElementById("interpretation").textContent=desc;
+ show("result");
+}
+function restart(){show("welcome");}
+</script>
+</body>
+</html>
